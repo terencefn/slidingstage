@@ -86,11 +86,51 @@ export const subscribeToEvents = (game: Game): void => {
         game.moveMapObject("compress1", "rCompress", {x: rStart - ratio, y: 2}, 1000, "Linear")
     })
     
-  /*
+  //setting up star objs
+  let score1 =0;
+  let score2 =0;
+  let score3 =0;
+  let starStaticImage = "https://cdn.gather.town/storage.googleapis.com/gather-town.appspot.com/internal-dashboard/images/iq44NYsI898G_-Irx3w6k";
+  let starMovingImage = "https://cdn.gather.town/storage.googleapis.com/gather-town.appspot.com/uploads/r8ULKH9t1Yzye0p3/0GKUOGcee9HgcDANXp7G5t";
+  game.setObject("stage1", "starDesk1", {normal: starStaticImage, id:"starDesk1", x:5, y: 11, type: 5, width:1, height:1, previewMessage: "+1"})
+  game.setObject("stage1", "starDesk2", {normal: starStaticImage, id:"starDesk2", x:10, y: 11, type: 5, width:1, height:1, previewMessage: "+1"})
+  game.setObject("stage1", "starDesk3", {normal: starStaticImage, id:"starDesk3", x:15, y: 11, type: 5, width:1, height:1, previewMessage: "+1"})
+  
+  let clearAllImage = "https://cdn.gather.town/storage.googleapis.com/gather-town.appspot.com/uploads/r8ULKH9t1Yzye0p3/BgZpx0gvRCmo3C4m1mjcQn";
+  game.setObject("stage1", "clearAll", {normal: clearAllImage, id:"clearAll", x:21, y: 8, type: 5, width:1, height:1, previewMessage: "CLEAR ALL SCORES"})
+
+
     game.subscribeToEvent("playerInteracts",({playerInteracts},context)=>{
-        
+      console.log(context.player + " x with " + playerInteracts.objId)
+      let nearestObj = playerInteracts.objId;
+      let nearestObjIdStart = playerInteracts.objId.substring(0, 13);
+      console.log("idnearestis: " + nearestObjIdStart);
+
+      switch (nearestObj) {
+        case "starDesk1":
+          throwStar(context.player?.x!, context.player?.y!, 7, 3, 1)
+        break;
+        case "starDesk2":
+          throwStar(context.player?.x!, context.player?.y!, 11, 3, 2)
+        break;
+        case "starDesk3":
+          throwStar(context.player?.x!, context.player?.y!, 15, 3, 3)
+        break;
+        case "clearAll":
+            score1 = 0;  score2 = 0; score3 = 0;
+            let scoreLabelX1 = "https://2y74lxqi4a.execute-api.us-west-2.amazonaws.com/dev/draw-text?text=" + score1 + "&font=Roboto-Bold.ttf&red=250&green=250&blue=200";
+            let scoreLabelX2 = "https://2y74lxqi4a.execute-api.us-west-2.amazonaws.com/dev/draw-text?text=" + score2 + "&font=Roboto-Bold.ttf&red=250&green=250&blue=200";
+            let scoreLabelX3 = "https://2y74lxqi4a.execute-api.us-west-2.amazonaws.com/dev/draw-text?text=" + score3 + "&font=Roboto-Bold.ttf&red=250&green=250&blue=200";
+            game.setObject("stage1", "score1", {normal: scoreLabelX1, id:"score1", x:7, y: 3, type: 0, width:3, height:1})
+            game.setObject("stage1", "score2", {normal: scoreLabelX2, id:"score2", x:11, y: 3, type: 0, width:3, height:1})
+            game.setObject("stage1", "score3", {normal: scoreLabelX3, id:"score3", x:15, y: 3, type: 0, width:3, height:1})
+            break;
+
+      default: break;
+
+      }
     })
-    */
+    
 
   game.subscribeToEvent(
     "playerSendsCommand",
@@ -108,11 +148,45 @@ export const subscribeToEvents = (game: Game): void => {
     }
   );
 
-  /*
-    game.subscribeToEvent("playerTriggersItem",({playerTriggersItem},context)=>{
+  
+    // game.subscribeToEvent("playerTriggersItem",({playerTriggersItem},context)=>{
         
-    })
-    */
+    // })
+    
+    async function throwStar(startX: number, startY: number, endX: number, endY: number, board: number){
+      
+      await game.setObject("stage1", "starFlying", {normal: starMovingImage, id:"starFlying", x:startX, y: startY, type: 5, width:1, height:1})
+      await game.moveMapObject("stage1", "starFlying", {x: endX, xOffset: 0, y: endY, yOffset: 0}, 1800, "Cubic")
+     setTimeout(() => {
+      game.deleteObject("stage1", "starFlying")
+      if (board == 1){
+        score1 ++;
+        let scoreLabel1 = "https://2y74lxqi4a.execute-api.us-west-2.amazonaws.com/dev/draw-text?text=" + score1 + "&font=Roboto-Bold.ttf&red=250&green=250&blue=200";
+        game.setObject("stage1", "score1", {normal: scoreLabel1, id:"score1", x:7, y: 3, type: 0, width:3, height:1})
+      }
+      else if (board ==2){
+        score2 ++;
+        let scoreLabel2 = "https://2y74lxqi4a.execute-api.us-west-2.amazonaws.com/dev/draw-text?text=" + score2 + "&font=Roboto-Bold.ttf&red=250&green=250&blue=200";
+        game.setObject("stage1", "score2", {normal: scoreLabel2, id:"score2", x:11, y: 3, type: 0, width:3, height:1})
+
+      }
+      else if (board == 3){
+        score3 ++;
+        let scoreLabel1 = "https://2y74lxqi4a.execute-api.us-west-2.amazonaws.com/dev/draw-text?text=" + score3 + "&font=Roboto-Bold.ttf&red=250&green=250&blue=200";
+        game.setObject("stage1", "score3", {normal: scoreLabel1, id:"score3", x:15, y: 3, type: 0, width:3, height:1})
+
+
+      }
+     
+      }, 1800);
+    
+    }
+    
+    function delay(ms: number) {
+      console.log("awaited delay- " + ms)
+      return new Promise( resolve => setTimeout(resolve, ms) );
+    }
+
 };
 
 /**
@@ -158,3 +232,4 @@ const checkUserPermissions = (
       break;
   }
 };
+
