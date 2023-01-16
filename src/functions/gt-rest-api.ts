@@ -4,7 +4,7 @@
  */
 
 import axios from "axios";
-import { GameMapV2, Space } from "@gathertown/gather-game-client";
+import { GameMap, Space } from "@gathertown/gather-game-client";
 //These endpoints taken from the Gather.town Notion documentation
 
 const API_KEY = process.env.API_KEY;
@@ -58,13 +58,13 @@ export const getMap = async (spaceURL: string, mapID: string) => {
     },
   });
 
-  return data as GameMapV2;
+  return data as GameMap;
 };
 
 export const setMap = async (
   spaceURL: string,
   mapID: string,
-  newMapData: Partial<GameMapV2>
+  newMapData: Partial<GameMap>
 ) => {
   const urlParser = spaceURL.split("/");
   const { status, data } = await axios({
